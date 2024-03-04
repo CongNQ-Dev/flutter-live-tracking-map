@@ -15,8 +15,8 @@ class OrderTrackingPage extends StatefulWidget {
 
 class _OrderTrackingPageState extends State<OrderTrackingPage> {
   final Completer<GoogleMapController> _controller = Completer();
-  static const LatLng sourceLocation = LatLng(37.33500926, -122.03272188);
-  static const LatLng destination = LatLng(37.33429383, -122.06600055);
+  static const LatLng sourceLocation = LatLng(10.7767, 106.6867);
+  static const LatLng destination = LatLng(10.773201, 106.700752);
   List<LatLng> polylineCoordinates = [];
   LocationData? currentLocation;
   void getCurrentLocation() async {
@@ -45,11 +45,13 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       (location) {
         currentLocation = location;
         print(currentLocation);
+        getPolyPoints();
       },
     );
   }
 
   void getPolyPoints() async {
+    // print('location: ${currentLocation!.latitude!}');
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
         google_api_key,
@@ -98,6 +100,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                     markerId: MarkerId('currentLocation'),
                     position: LatLng(currentLocation!.latitude!,
                         currentLocation!.longitude!),
+                  ),
+                  Marker(
+                    markerId: MarkerId('source'),
+                    position: LatLng(
+                        sourceLocation!.latitude!, sourceLocation!.longitude!),
                   ),
                   Marker(
                       markerId: MarkerId('destination'), position: destination),
