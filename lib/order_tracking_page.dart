@@ -95,8 +95,10 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                 },
               markers: {
                   Marker(
-                      markerId: MarkerId('currentLocation'),
-                      position: sourceLocation),
+                    markerId: MarkerId('currentLocation'),
+                    position: LatLng(currentLocation!.latitude!,
+                        currentLocation!.longitude!),
+                  ),
                   Marker(
                       markerId: MarkerId('destination'), position: destination),
                 }),
