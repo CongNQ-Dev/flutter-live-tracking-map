@@ -82,7 +82,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
             )
           : GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: sourceLocation,
+                target: LatLng(
+                    currentLocation!.latitude!, currentLocation!.longitude!),
                 zoom: 13.5,
               ),
               polylines: {
@@ -94,7 +95,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                 },
               markers: {
                   Marker(
-                      markerId: MarkerId('sourceLocation'),
+                      markerId: MarkerId('currentLocation'),
                       position: sourceLocation),
                   Marker(
                       markerId: MarkerId('destination'), position: destination),
