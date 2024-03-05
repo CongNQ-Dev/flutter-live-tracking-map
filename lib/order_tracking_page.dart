@@ -19,9 +19,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
   static const LatLng destination = LatLng(10.773201, 106.700752);
   List<LatLng> polylineCoordinates = [];
   LocationData? currentLocation;
+  BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
   void getCurrentLocation() async {
     Location location = Location();
-
     bool serviceEnabled;
     PermissionStatus permissionGranted;
 
@@ -40,7 +42,6 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
         return;
       }
     }
-
     location.getLocation().then(
       (location) {
         currentLocation = location;
@@ -48,6 +49,10 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
         getPolyPoints();
       },
     );
+    location.onLocationChanged.listen((newLoc) {
+      currentLocation = newLoc;
+      setState(() {});
+    });
   }
 
   void getPolyPoints() async {
@@ -55,7 +60,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
         google_api_key,
-        PointLatLng(sourceLocation.latitude, sourceLocation.longitude),
+        PointLatLng(currentLocation!.latitude!, currentLocation!.longitude!),
         PointLatLng(destination.latitude, destination.longitude));
     if (result.points.isNotEmpty) {
       result.points.forEach((PointLatLng point) =>
@@ -64,11 +69,27 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     }
   }
 
+  void setCustomMarkerIcon() {
+    BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, '').then((icon) {
+      sourceIcon = icon;
+    });
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration.empty, 'assets/icons/car.png')
+        .then((icon) {
+      destinationIcon = icon;
+    });
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration.empty, 'assets/icons/person.png')
+        .then((icon) {
+      currentLocationIcon = icon;
+    });
+  }
+
   @override
   void initState() {
     getCurrentLocation();
+    setCustomMarkerIcon();
 
-    getPolyPoints();
     super.initState();
   }
 
@@ -89,26 +110,34 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                 zoom: 13.5,
               ),
               polylines: {
-                  Polyline(
-                      polylineId: PolylineId('route'),
-                      points: polylineCoordinates,
-                      color: primaryColor,
-                      width: 6),
-                },
+                Polyline(
+                    polylineId: PolylineId('route'),
+                    points: polylineCoordinates,
+                    color: primaryColor,
+                    width: 6),
+              },
               markers: {
-                  Marker(
-                    markerId: MarkerId('currentLocation'),
-                    position: LatLng(currentLocation!.latitude!,
-                        currentLocation!.longitude!),
-                  ),
-                  Marker(
-                    markerId: MarkerId('source'),
-                    position: LatLng(
-                        sourceLocation!.latitude!, sourceLocation!.longitude!),
-                  ),
-                  Marker(
-                      markerId: MarkerId('destination'), position: destination),
-                }),
+                Marker(
+                  markerId: MarkerId('currentLocation'),
+                  position: LatLng(
+                      currentLocation!.latitude!, currentLocation!.longitude!),
+                  icon: currentLocationIcon,
+                ),
+                Marker(
+                  markerId: MarkerId('source'),
+                  position: LatLng(
+                      sourceLocation!.latitude!, sourceLocation!.longitude!),
+                ),
+                Marker(
+                  markerId: MarkerId('destination'),
+                  position: destination,
+                  icon: destinationIcon,
+                ),
+              },
+              onMapCreated: (mapController) {
+                _controller.complete(mapController);
+              },
+            ),
     );
   }
 }
