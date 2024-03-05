@@ -49,7 +49,6 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
         currentLocation = location;
         print(currentLocation);
         // getPolyPoints();
-        updatePolyline();
       },
     );
     location.onLocationChanged.listen((newLoc) {
@@ -57,7 +56,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       print('new location: $currentLocation');
       // googleMapController.animateCamera(CameraUpdate.newCameraPosition(
       //     CameraPosition(target: LatLng(newLoc.latitude!, newLoc.longitude!))));
-      updatePolyline();
+      updatePolyline(newLoc);
 
       setState(() {});
     });
@@ -77,14 +76,22 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     }
   }
 
-  void updatePolyline() async {
-    // Xóa đường polyline cũ
+  void updatePolyline(LocationData newLoc) async {
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        google_api_key,
+        PointLatLng(newLoc.latitude!, newLoc.longitude!),
+        PointLatLng(destination.latitude, destination.longitude));
     setState(() {
       polylineCoordinates.clear();
     });
-
-    // Tính toán và cập nhật đường polyline mới
-    getPolyPoints();
+    if (result.points.isNotEmpty) {
+      setState(() {
+        result.points.forEach((PointLatLng point) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        });
+      });
+    }
   }
 
   void setCustomMarkerIcon() {
