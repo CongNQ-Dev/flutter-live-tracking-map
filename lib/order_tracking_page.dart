@@ -15,8 +15,8 @@ class OrderTrackingPage extends StatefulWidget {
 
 class _OrderTrackingPageState extends State<OrderTrackingPage> {
   final Completer<GoogleMapController> _controller = Completer();
-  static const LatLng sourceLocation = LatLng(10.7767, 106.6867);
-  static const LatLng destination = LatLng(10.773201, 106.700752);
+  static const LatLng sourceLocation = LatLng(10.7912625, 106.6676691);
+  static const LatLng destination = LatLng(10.8004281, 106.6482586);
   List<LatLng> polylineCoordinates = [];
   LocationData? currentLocation;
   BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
@@ -42,6 +42,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
         return;
       }
     }
+    // GoogleMapController googleMapController =
+    //     await _controller.future; //load lau
     location.getLocation().then(
       (location) {
         currentLocation = location;
@@ -51,6 +53,9 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     );
     location.onLocationChanged.listen((newLoc) {
       currentLocation = newLoc;
+      print('new location: $currentLocation');
+      // googleMapController.animateCamera(CameraUpdate.newCameraPosition(
+      //     CameraPosition(target: LatLng(newLoc.latitude!, newLoc.longitude!))));
       setState(() {});
     });
   }
@@ -74,12 +79,12 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       sourceIcon = icon;
     });
     BitmapDescriptor.fromAssetImage(
-            ImageConfiguration.empty, 'assets/icons/car.png')
+            ImageConfiguration.empty, 'assets/icons/person3.png')
         .then((icon) {
       destinationIcon = icon;
     });
     BitmapDescriptor.fromAssetImage(
-            ImageConfiguration.empty, 'assets/icons/person.png')
+            ImageConfiguration.empty, 'assets/icons/car3.png')
         .then((icon) {
       currentLocationIcon = icon;
     });
@@ -107,7 +112,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
               initialCameraPosition: CameraPosition(
                 target: LatLng(
                     currentLocation!.latitude!, currentLocation!.longitude!),
-                zoom: 13.5,
+                zoom: 16.5,
               ),
               polylines: {
                 Polyline(
@@ -123,11 +128,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                       currentLocation!.latitude!, currentLocation!.longitude!),
                   icon: currentLocationIcon,
                 ),
-                Marker(
-                  markerId: MarkerId('source'),
-                  position: LatLng(
-                      sourceLocation!.latitude!, sourceLocation!.longitude!),
-                ),
+                // Marker(
+                //   markerId: MarkerId('source'),
+                //   position: LatLng(
+                //       sourceLocation!.latitude!, sourceLocation!.longitude!),
+                // ),
                 Marker(
                   markerId: MarkerId('destination'),
                   position: destination,
